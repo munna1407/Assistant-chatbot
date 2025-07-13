@@ -1,11 +1,445 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>College Admission NLP Chatbot</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --light-color: #ecf0f1;
+            --dark-color: #2c3e50;
+            --success-color: #27ae60;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            color: var(--dark-color);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+            border-radius: 8px 8px 0 0;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        header h1 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .logo {
+            width: 50px;
+            height: 50px;
+            margin-bottom: 15px;
+            border-radius: 50%;
+            background-color: var(--light-color);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .chat-container {
+            background-color: white;
+            border-radius: 0 0 8px 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            height: 600px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background-color: #f9f9f9;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .message {
+            max-width: 70%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            font-size: 1rem;
+            line-height: 1.4;
+            word-wrap: break-word;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .bot-message {
+            align-self: flex-start;
+            background-color: var(--secondary-color);
+            color: white;
+            border-top-left-radius: 4px;
+        }
+
+        .user-message {
+            align-self: flex-end;
+            background-color: var(--light-color);
+            color: var(--dark-color);
+            border-top-right-radius: 4px;
+        }
+
+        .chat-input {
+            display: flex;
+            padding: 15px;
+            background-color: white;
+            border-top: 1px solid #eee;
+        }
+
+        #user-input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 24px;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        #user-input:focus {
+            border-color: var(--secondary-color);
+        }
+
+        #send-button {
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            border-radius: 24px;
+            padding: 12px 20px;
+            margin-left: 10px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s;
+        }
+
+        #send-button:hover {
+            background-color: #2980b9;
+        }
+
+        .quick-questions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding: 10px 20px;
+            background-color: white;
+            border-top: 1px solid #eee;
+        }
+
+        .quick-question {
+            background-color: var(--light-color);
+            border: none;
+            border-radius: 16px;
+            padding: 8px 12px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .quick-question:hover {
+            background-color: #d0d9e0;
+        }
+
+        .timestamp {
+            font-size: 0.7rem;
+            opacity: 0.7;
+            margin-top: 4px;
+            text-align: right;
+        }
+
+        .thinking {
+            display: inline-block;
+            color: var(--dark-color);
+            opacity: 0.7;
+            font-style: italic;
+        }
+
+        .error-message {
+            color: var(--accent-color);
+            text-align: center;
+            padding: 10px;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            header h1 {
+                font-size: 1.8rem;
+            }
+
+            .chat-container {
+                height: 500px;
+            }
+
+            .message {
+                max-width: 85%;
+            }
+        }
+    </style>
 </head>
 <body>
-  <center><h1><font color="blue">HELLO WORLD</font></h1></center>
+    <div class="container">
+    <header>
+          
+        <h1>NLP-Powered Admission Assistant Chatbot</h1>
+        <p>AI assistant for college admission queries using Natural Language Processing</p>
+        <div class="logo" style="margin-top: 15px;">
+            <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/367a0ea6-4190-40df-ab96-f7defb5e2a3b.png" 
+             alt="AI chatbot icon representing natural language processing for college admissions" 
+             style="width: 80px; height: 80px; border-radius: 50%;">
+        </div>
+    </header>
+ 
+           
+        
+
+        <div class="chat-container">
+            <div class="chat-messages" id="chat-messages">
+                <!-- Messages will appear here -->
+            </div>
+
+            <div class="quick-questions" id="quick-questions">
+                <button class="quick-question">Application deadlines</button>
+                <button class="quick-question">Required documents</button>
+                <button class="quick-question">Scholarships available</button>
+                <button class="quick-question">Campus tours</button>
+            </div>
+
+            <div class="chat-input">
+                <input type="text" id="user-input" placeholder="Ask about admission requirements, deadlines, programs..." autocomplete="off">
+                <button id="send-button">Send</button>
+                <div id="nlp-processing" style="display:none; margin-left:10px; font-size:0.9rem;">
+                    <span style="color:#3498db;">Processing with NLP...</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const chatMessages = document.getElementById('chat-messages');
+            const userInput = document.getElementById('user-input');
+            const sendButton = document.getElementById('send-button');
+            const quickQuestions = document.querySelectorAll('.quick-question');
+
+            // Initial bot greeting
+            setTimeout(() => {
+                addBotMessage("Hello! I'm your NLP-Powered Admission Assistant Chatbot. How can I help you today?<br><br>" +
+                                 "You can ask about:<br>" +
+                                 "- Application Requirements<br>" +
+                                 "- Admission Fees<br>" +
+                                 "- Contact Information<br>" +
+                                 "- Eligibility Criteria<br>" +
+                                 "- Deadlines<br>" +
+                                 "- Programs Offered<br>" +
+                                 "- Scholarships & Financial Aid<br>" +
+                                 "- Campus Visits<br><br>" +
+                                 "Just type your question below to get started!");
+            }, 500);
+
+            // Send message when button is clicked
+            sendButton.addEventListener('click', sendMessage);
+
+            // Send message when Enter is pressed
+            userInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+
+            // Quick questions buttons
+            quickQuestions.forEach(button => {
+                button.addEventListener('click', function() {
+                    const question = this.textContent;
+                    addUserMessage(question);
+                    userInput.value = '';
+                    setTimeout(() => {
+                        processQuestion(question);
+                    }, 500);
+                });
+            });
+
+            function sendMessage() {
+                const message = userInput.value.trim();
+                if (message) {
+                    addUserMessage(message);
+                    userInput.value = '';
+                    setTimeout(() => {
+                        processQuestion(message);
+                    }, 500);
+                }
+            }
+
+            function addUserMessage(message) {
+                const messageElement = document.createElement('div');
+                messageElement.classList.add('message', 'user-message');
+                messageElement.innerHTML = message;
+                
+                const timestamp = document.createElement('div');
+                timestamp.classList.add('timestamp');
+                timestamp.textContent = getCurrentTime();
+                
+                messageElement.appendChild(timestamp);
+                chatMessages.appendChild(messageElement);
+                scrollToBottom();
+            }
+
+            function addBotMessage(message) {
+                // Show thinking indicator
+                const thinkingElement = document.createElement('div');
+                thinkingElement.classList.add('message', 'bot-message', 'thinking');
+                thinkingElement.textContent = "Typing...";
+                chatMessages.appendChild(thinkingElement);
+                scrollToBottom();
+
+                // After delay, replace with actual message
+                setTimeout(() => {
+                    thinkingElement.remove();
+                    
+                    const messageElement = document.createElement('div');
+                    messageElement.classList.add('message', 'bot-message');
+                    messageElement.innerHTML = message;
+                    
+                    const timestamp = document.createElement('div');
+                    timestamp.classList.add('timestamp');
+                    timestamp.textContent = getCurrentTime();
+                    
+                    messageElement.appendChild(timestamp);
+                    chatMessages.appendChild(messageElement);
+                    scrollToBottom();
+                }, 1000 + Math.random() * 1500); // Random delay between 1-2.5 seconds
+            }
+
+            function processQuestion(question) {
+                question = question.toLowerCase();
+                let response = "";
+                
+                // Simple NLP processing with pattern matching
+                if (question.includes('hello') || question.includes('hi') || question.includes('hey')) {
+                    response = "Hello! How can I help with your college admission questions today?";
+                }
+                else if (question.includes('deadline') || question.includes('due date')) {
+                    response = "Our admission deadlines is 30 August. Make sure you apply before that.";              
+                }
+                else if (question.includes('requirement') || question.includes('need') || question.includes('document')) {
+                    response = "You need the following documents for admission:<br><br>" +
+                               "- 10th & 12th marksheets<br>" +
+                               "- ID proof(Aadhar/Passport)<br>" +
+                               "- Recent passport size photos<br><br>" +
+                               "Some programs may have additional requirements.";
+                }
+                else if (question.includes('scholarship') || question.includes('financial aid') || question.includes('tuition')) {
+                    response = "We offer several scholarship opportunities:<br><br>" +
+                               "- Academic Excellence Scholarship: Up to 80,000/year<br>" +
+                               "- Leadership Award: 25,000-35,000<br>" +
+                               "- Need-based Grants: Based on family income<br>" +
+                               "- Special Talent Scholarships (college coding challenge, athletics)<br><br>" +
+                               "Apply early for scholarship consideration.";
+                }
+                else if (question.includes('program') || question.includes('major') || question.includes('study')) {
+                    response = "We offer over 120 undergraduate programs across 6 schools:<br><br>" + 
+                               "- Engineering<br>" +
+                               "- Business<br>" +
+                               "- B.Sc & M.Sc <br><br>" +
+                               "Would you like information about a specific program?";
+                }
+                else if (question.includes('eligibility') || question.includes('criteria') || question.includes('admission')) {
+                    response = "Eligibility criteria for undergraduate programs:<br><br>" +
+                               "- 10+2 with minimum 50% marks<br>" +
+                               "- Entrance exam scores (JEE Main, SAT, etc.)<br>" +
+                               "- For MBA: Bachelor's degree + entrance exam (CAT, GMAT)<br><br>" +
+                               "Check our website for specific program requirements.";
+                }
+                else if (question.includes('tour') || question.includes('visit') || question.includes('campus')) {
+                    response = "We'd love to have you visit! Campus tour options include:<br><br>" +
+                               "- General Information Sessions (M/W/F)<br>" +
+                               "- Department-Specific Tours<br>" +
+                               "- Virtual Tour available 24/7<br><br>" +
+                               "You can schedule a visit through our admissions website.";
+                }
+                else if (question.includes('fee') || question.includes('cost') || question.includes('price')) {
+                    response = "For the 2025-2026 academic year(Admission fees vary by course):<br><br>" +
+                               "- B.Tech: 120000 per year<br>" +
+                               "- M.Tech: 130000 per year<br>" +
+                               "- MBA: 110000 per year<br><br>" +
+                               "Let me know your program for exact fee details.";
+                }
+                else if (question.includes('contact') || question.includes('email') || question.includes('phone')) {
+                    response = "You can reach our admission office at:<br><br>" +
+                               "- Phone: +91-9876543210<br>" +
+                               "- Email: admissions@college.edu<br>" +
+                               "- Address: 123 College St, City, State, Zip<br><br>" +
+                               "- Office Hours: Mon-Fri, 9am-5pm";
+                }
+                else if (question.includes('international') || question.includes('visa') || question.includes('foreign')) {
+                    response = "For international applicants, we require:<br><br>" +
+                               "- TOEFL (min 80) or IELTS (min 6.5) scores<br>" +
+                               "- Financial certification form<br>" +
+                               "- Transcript evaluation for some countries<br>" +
+                               "- Copy of passport<br><br>" +
+                               "We issue I-20 forms after admission.";
+                }
+                else {
+                    response = "My NLP model didn't fully understand your query. I can process questions about:<br><br>" +
+                               "- Application Requirements<br>" +
+                               "- Admission Fees<br>" +
+                               "- Contact Information<br>" +
+                               "- Eligibility_Criteria<br>" +
+                               "- Deadlines<br>" +
+                               "- Programs Offered<br>" +
+                               "- Scholarships & Financial Aid<br>" +
+                               "- Campus Visits<br><br>" +
+                               "Which of these would you like to know about?";
+                }
+
+                addBotMessage(response);
+            }
+
+            function scrollToBottom() {
+                chatMessages.scrollTo({
+                    top: chatMessages.scrollHeight,
+                    behavior: 'smooth'
+                });
+            }
+
+            function getCurrentTime() {
+                const now = new Date();
+                return now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            }
+        });
+    </script>
 </body>
 </html>
+
+
